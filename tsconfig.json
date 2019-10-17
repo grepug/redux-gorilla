@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "lib": ["es5", "es6", "es7", "es2017", "dom"],
+    "module": "commonjs",
+    "target": "es2017",
+    "jsx": "react",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": "src",
+    "noImplicitThis": true,
+    "allowSyntheticDefaultImports": true,
+    "strictNullChecks": true,
+    "declaration": true
+  },
+  "exclude": ["node_modules", "dist"]
+}
