@@ -17,7 +17,20 @@ export interface QueryState<Response, QueryParams> {
   params: QueryParams;
 }
 
-export enum QueryStatus {
+export class MutationTuple<Response> {
+  isSuccuss = false;
+  loading = false;
+  message: string | null = null;
+  errMsg: string | null = null;
+  data: Response | null = null;
+}
+
+export interface MutationState<Response, MutationParams> {
+  res: MutationTuple<Response>;
+  params: MutationParams;
+}
+
+export enum RequestStatus {
   SUCESS = 'success',
   ERROR = 'error',
   LOADING = 'loading',
@@ -28,6 +41,7 @@ export type Action = {
   payload?: any;
   page?: Pagination;
   queryParams?: any;
+  mutationParams?: any;
 };
 
 export interface InitialStateType<Response> {
@@ -42,10 +56,14 @@ export enum ActionDataType {
   INIT = 'initialize',
   INIT_RES = 'initializeRes',
   SET_QUERY_PARAMS = 'setQueryParams',
+
+  INIT_MUTATION = 'initMutation',
+  MUTATION = 'mutation',
 }
 
-export class InitialState<Response, QueryParams> {
-  query: Partial<Record<string, QueryState<Response, QueryParams>>> = {};
+export class InitialState<Response, Params> {
+  query: Partial<Record<string, QueryState<Response, Params>>> = {};
+  mutations: Partial<Record<string, MutationState<Response, Params>>> = {};
 }
 
 export interface PageParamNames {

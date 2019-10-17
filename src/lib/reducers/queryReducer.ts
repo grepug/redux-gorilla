@@ -2,33 +2,34 @@ import {
   Action,
   ActionDataType,
   InitialState,
-  QueryStatus,
-  QueryTuple
-} from "../types";
-import update from "immutability-helper";
-import { ACTION_TYPE_SEPARATOR } from "../constants";
+  RequestStatus,
+  QueryTuple,
+  MutationTuple,
+} from '../types';
+import update from 'immutability-helper';
+import { ACTION_TYPE_SEPARATOR } from '../constants';
 
 export const queryReducerFactory = (
   options: {
     getInitialState?: () => any;
-  } = {}
+  } = {},
 ) => (
   state = options.getInitialState
     ? options.getInitialState()
     : new InitialState(),
-  action: Action
+  action: Action,
 ) => {
   const [key, dataType, status] = action.type.split(ACTION_TYPE_SEPARATOR) as [
     string,
     ActionDataType,
-    QueryStatus
+    RequestStatus,
   ];
 
-  const [url, paramsString] = key.split("?");
+  const [url, paramsString] = key.split('?');
 
   if (dataType === ActionDataType.QUERY) {
     switch (status) {
-      case QueryStatus.SUCESS:
+      case RequestStatus.SUCESS:
         // handle page data
         if (action.page) {
           return update(state, {
@@ -45,27 +46,27 @@ export const queryReducerFactory = (
                         }
                         s[current - 1] = action.payload;
                         return s;
-                      }
+                      },
                     },
                     page: {
                       $apply: (page: any) => {
                         return {
                           ...page,
                           ...action.page,
-                          current: page.current
+                          current: page.current,
                         };
-                      }
+                      },
                     },
                     loading: {
-                      $set: false
+                      $set: false,
                     },
                     error: {
-                      $set: false
-                    }
-                  }
-                }
-              }
-            }
+                      $set: false,
+                    },
+                  },
+                },
+              },
+            },
           });
         }
         return update(state, {
@@ -74,58 +75,57 @@ export const queryReducerFactory = (
               res: {
                 [paramsString]: {
                   data: {
-                    $set: action.payload
+                    $set: action.payload,
                   },
                   loading: {
-                    $set: false
+                    $set: false,
                   },
                   error: {
-                    $set: false
-                  }
-                }
-              }
-            }
-          }
+                    $set: false,
+                  },
+                },
+              },
+            },
+          },
         });
-      case QueryStatus.LOADING:
+      case RequestStatus.LOADING:
         return update(state, {
           query: {
             [url]: {
               res: {
                 [paramsString]: {
                   loading: {
-                    $set: true
+                    $set: true,
                   },
                   error: {
-                    $set: false
-                  }
-                }
-              }
-            }
-          }
+                    $set: false,
+                  },
+                },
+              },
+            },
+          },
         });
-      case QueryStatus.ERROR:
+      case RequestStatus.ERROR:
         return update(state, {
           query: {
             [url]: {
               res: {
                 [paramsString]: {
                   loading: {
-                    $set: false
+                    $set: false,
                   },
                   error: {
-                    $set: true
-                  }
-                }
-              }
-            }
-          }
+                    $set: true,
+                  },
+                },
+              },
+            },
+          },
         });
       default:
         return state;
     }
-  }
-  if (dataType === ActionDataType.CHANGE_CURRENT_PAGE) {
+  } else if (dataType === ActionDataType.CHANGE_CURRENT_PAGE) {
     return update(state, {
       query: {
         [url]: {
@@ -133,52 +133,92 @@ export const queryReducerFactory = (
             [paramsString]: {
               page: {
                 current: {
-                  $set: action.page!.current
-                }
-              }
-            }
-          }
-        }
-      }
+                  $set: action.page!.current,
+                },
+              },
+            },
+          },
+        },
+      },
     });
-  }
-  if (dataType === ActionDataType.INIT) {
+  } else if (dataType === ActionDataType.INIT) {
     return update(state, {
       query: {
         $merge: {
           [url]: {
             res: {
-              [paramsString]: new QueryTuple()
+              [paramsString]: new QueryTuple(),
             },
-            params: action.queryParams || {}
-          }
-        }
-      }
+            params: action.queryParams || {},
+          },
+        },
+      },
     });
-  }
-  if (dataType === ActionDataType.INIT_RES) {
+  } else if (dataType === ActionDataType.INIT_RES) {
     return update(state, {
       query: {
         [url]: {
           res: {
             $merge: {
-              [paramsString]: new QueryTuple()
-            }
-          }
-        }
-      }
+              [paramsString]: new QueryTuple(),
+            },
+          },
+        },
+      },
     });
-  }
-  if (dataType === ActionDataType.SET_QUERY_PARAMS) {
+  } else if (dataType === ActionDataType.SET_QUERY_PARAMS) {
     return update(state, {
       query: {
         [url]: {
           params: {
-            $merge: action.queryParams || {}
-          }
-        }
-      }
+            $merge: action.queryParams || {},
+          },
+        },
+      },
     });
+  } else if (dataType === ActionDataType.INIT_MUTATION) {
+    return update(state, {
+      mutations: {
+        $merge: {
+          [url]: {
+            res: new MutationTuple(),
+            params: {},
+          },
+        },
+      },
+    });
+  } else if (dataType === ActionDataType.MUTATION) {
+    switch (status) {
+      case RequestStatus.LOADING:
+        return update(state, {
+          mutations: {
+            [url]: {
+              res: {
+                $merge: {
+                  loading: true,
+                },
+              },
+            },
+          },
+        });
+      case RequestStatus.SUCESS:
+        return update(state, {
+          mutations: {
+            [url]: {
+              res: {
+                $merge: {
+                  success: true,
+                  loading: false,
+                  error: false,
+                  data: action.payload,
+                  // TODO error message
+                },
+              },
+            },
+          },
+        });
+    }
   }
+
   return state;
 };
