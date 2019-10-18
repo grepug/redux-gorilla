@@ -10,12 +10,12 @@
   "author": "Kai",
   "license": "ISC",
   "peerDependencies": {
-    "react": "^16.10.2",
-    "react-redux": "^7.1.1",
-    "redux": "^4.0.4",
     "@types/react": "^16.9.9",
     "@types/react-redux": "^7.1.4",
-    "@types/redux": "^3.6.0"
+    "@types/redux": "^3.6.0",
+    "react": "^16.10.2",
+    "react-redux": "^7.1.1",
+    "redux": "^4.0.4"
   },
   "dependencies": {
     "immutability-helper": "^3.0.1",
@@ -23,6 +23,9 @@
   },
   "devDependencies": {
     "@types/lodash.get": "^4.4.6",
-    "typescript": "^3.6.4"
+    "typescript": "^3.6.4",
+    "@types/react": "^16.9.9",
+    "@types/react-redux": "^7.1.4",
+    "@types/redux": "^3.6.0"
   }
 }

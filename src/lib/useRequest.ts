@@ -1,9 +1,9 @@
 import {
   OptionsPage,
   ActionDataType,
-  QueryStatus,
   QueryState,
   HttpRequestMethod,
+  RequestStatus,
 } from './types';
 import { request } from './request';
 import { useDispatch } from 'react-redux';
@@ -69,7 +69,7 @@ export const useRequest = <Response, QueryParams>(
       request<Response>(httpRequest, {
         beforeRequest: () => {
           isLoadingRef.current = true;
-          dispatch([key, ActionDataType.QUERY, QueryStatus.LOADING]);
+          dispatch([key, ActionDataType.QUERY, RequestStatus.LOADING]);
         },
         onResponse: res => {
           isLoadingRef.current = false;
@@ -86,7 +86,7 @@ export const useRequest = <Response, QueryParams>(
               [
                 key,
                 ActionDataType.QUERY,
-                QueryStatus.SUCESS,
+                RequestStatus.SUCESS,
                 `curPage=${current}&total=${total}`,
               ],
               {
@@ -101,13 +101,13 @@ export const useRequest = <Response, QueryParams>(
             );
           }
 
-          return dispatch([key, ActionDataType.QUERY, QueryStatus.SUCESS], {
+          return dispatch([key, ActionDataType.QUERY, RequestStatus.SUCESS], {
             payload: res,
           });
         },
         onError: () => {
           isLoadingRef.current = false;
-          return dispatch([key, ActionDataType.QUERY, QueryStatus.ERROR]);
+          return dispatch([key, ActionDataType.QUERY, RequestStatus.ERROR]);
         },
         url,
         query,
