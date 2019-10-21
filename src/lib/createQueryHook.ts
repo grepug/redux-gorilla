@@ -1,13 +1,12 @@
 import {
-  CacheStrategyType,
   InitialState,
   GetDataType,
   CreateQueryHookOptions,
   ActionDataType,
-  OptionsPage,
   QueryTuple,
   Pagination,
   HttpRequestMethod,
+  Method,
 } from './types';
 import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import { useEffect, useCallback, useMemo } from 'react';
@@ -28,7 +27,7 @@ export const createQueryHook = <Response, Selected, QueryParams>(
   };
 
   const dispatch = myDispatch(useDispatch());
-  const { cacheStrategy, isRequestOnMount } = options;
+  const { isRequestOnMount } = options;
 
   const getState = (state: ReduxInitialState) => {
     return state.gorilla.query[url];
@@ -55,19 +54,21 @@ export const createQueryHook = <Response, Selected, QueryParams>(
     }
   }, [!!queryState, queryParams, queryParamString]);
 
-  const { request } = useRequest(httpRequest, {
-    key,
-    url,
-    queryParamString,
-    page: options.page as OptionsPage,
-    queryState,
-    params: {
-      ...queryParams,
+  const { request } = useRequest(
+    httpRequest,
+    {
+      key,
+      url,
+      actionDataType: ActionDataType.QUERY,
+      query: queryParams,
+      method: Method.GET,
+      canRequest: !!queryState && !!queryState.res[queryParamString],
     },
-  });
+    [queryState, queryParamString],
+  );
 
   // poll
-  useInterval(() => request({}), {
+  useInterval(() => request(), {
     delay: options.poll || null,
   });
 
@@ -106,34 +107,11 @@ export const createQueryHook = <Response, Selected, QueryParams>(
         !isLoading &&
         (isRequestOnMount || isKeysChangeRequest || isRefetch_)
       ) {
-        const isRefetch = cacheStrategy === CacheStrategyType.CACHE_AND_FETCH;
-        request({ isRefetch });
+        // const isRefetch = cacheStrategy === CacheStrategyType.CACHE_AND_FETCH;
+        request();
       }
     }
   }, [key, !!queryState, queryParamString, queryParamKeyLength]);
-
-  const changePage = useCallback(
-    (fetchPage?: number) => {
-      if (queryState && queryState.res[queryParamString]) {
-        const { hasNoMore } = queryState.res[queryParamString].page;
-
-        if (fetchPage) {
-          // 分页选择器
-          dispatch([key, ActionDataType.CHANGE_CURRENT_PAGE], {
-            page: {
-              current: fetchPage,
-            },
-          });
-          request({ fetchPage });
-        } else if (!hasNoMore) {
-          // TODO
-          // 触底加载更多
-          request({});
-        }
-      }
-    },
-    [queryState, request],
-  );
 
   const setParams = useCallback(
     (queryParams: Partial<QueryParams>) => {
@@ -166,7 +144,6 @@ export const createQueryHook = <Response, Selected, QueryParams>(
     res,
     params,
     data,
-    changePage,
     setParams,
     request,
   };

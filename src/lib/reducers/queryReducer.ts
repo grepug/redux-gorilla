@@ -182,7 +182,7 @@ export const queryReducerFactory = (
         $merge: {
           [url]: {
             res: new MutationTuple(),
-            params: {},
+            dto: {},
           },
         },
       },
@@ -218,6 +218,16 @@ export const queryReducerFactory = (
           },
         });
     }
+  } else if (dataType === ActionDataType.SET_DTO) {
+    return update(state, {
+      mutations: {
+        [url]: {
+          dto: {
+            $merge: action.dto || {},
+          },
+        },
+      },
+    });
   }
 
   return state;

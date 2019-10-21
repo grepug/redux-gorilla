@@ -6,10 +6,9 @@ export class Pagination {
 }
 
 export class QueryTuple<Response> {
-  data: Response | Response[] | null = null;
+  data: Response | null = null;
   loading = false;
   error = false;
-  page = new Pagination();
 }
 
 export interface QueryState<Response, QueryParams> {
@@ -18,16 +17,16 @@ export interface QueryState<Response, QueryParams> {
 }
 
 export class MutationTuple<Response> {
-  isSuccuss = false;
+  success = false;
   loading = false;
   message: string | null = null;
   errMsg: string | null = null;
   data: Response | null = null;
 }
 
-export interface MutationState<Response, MutationParams> {
+export interface MutationState<Response, DataTransferObject> {
   res: MutationTuple<Response>;
-  params: MutationParams;
+  dto: DataTransferObject;
 }
 
 export enum RequestStatus {
@@ -42,6 +41,7 @@ export type Action = {
   page?: Pagination;
   queryParams?: any;
   mutationParams?: any;
+  dto?: any;
 };
 
 export interface InitialStateType<Response> {
@@ -59,6 +59,7 @@ export enum ActionDataType {
 
   INIT_MUTATION = 'initMutation',
   MUTATION = 'mutation',
+  SET_DTO = 'setDTO',
 }
 
 export class InitialState<Response, Params> {
@@ -106,7 +107,24 @@ export interface CreateQueryHookOptions<T> {
   isRequestOnMount?: boolean;
 }
 
+export interface CreateMutationHookOptions<DataTransferObject> {
+  dto?: DataTransferObject;
+  onMutated?: () => void;
+}
+
 export type HttpRequestMethod<Response> = (
   url: string,
-  method: string,
+  method: Method,
+  config: {
+    body?: any;
+    query?: any;
+  },
 ) => Promise<Response>;
+
+export enum Method {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
+  PATCH = 'PATCH',
+}
