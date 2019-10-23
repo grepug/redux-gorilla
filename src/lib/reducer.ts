@@ -5,11 +5,11 @@ import {
   RequestStatus,
   QueryTuple,
   MutationTuple,
-} from '../types';
+} from './types';
 import update from 'immutability-helper';
-import { ACTION_TYPE_SEPARATOR } from '../constants';
+import { ACTION_TYPE_SEPARATOR } from './constants';
 
-export const queryReducerFactory = (
+export const gorillaReducerFactory = (
   options: {
     getInitialState?: () => any;
   } = {},

@@ -15,10 +15,10 @@
     "@types/redux": "^3.6.0",
     "react": "^16.10.2",
     "react-redux": "^7.1.1",
-    "redux": "^4.0.4"
+    "redux": "^4.0.4",
+    "immutability-helper": "^3.0.1"
   },
   "dependencies": {
-    "immutability-helper": "^3.0.1",
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {
