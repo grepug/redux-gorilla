@@ -108,8 +108,10 @@ export interface CreateQueryHookOptions<T> {
 }
 
 export interface CreateMutationHookOptions<DataTransferObject> {
-  dto?: DataTransferObject;
+  dto?: new () => Partial<DataTransferObject>;
   onMutated?: () => void;
+  // TODO add change key
+  onDtoChange?: (dto: DataTransferObject) => void;
 }
 
 export type HttpRequestMethod<Response> = (

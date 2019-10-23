@@ -47,7 +47,11 @@ export const createMutationHook = <Response, DataTransferObject>(
       url,
       canRequest: !!mutationState,
       method: Method.POST,
-      body: mutationState ? mutationState.dto : options.dto,
+      body: mutationState
+        ? mutationState.dto
+        : options.dto
+        ? new options.dto()
+        : {},
     },
     [mutationState],
   );
@@ -80,10 +84,21 @@ export const createMutationHook = <Response, DataTransferObject>(
     [mutationState],
   );
 
+  useEffect(() => {
+    options.onDtoChange && options.onDtoChange(dto);
+  }, [dto]);
+
+  const initialDto = options.dto;
+
+  const resetDto = useCallback(() => {
+    setDto(initialDto ? new initialDto() : {});
+  }, [initialDto]);
+
   return {
     res,
     dto,
     setDto,
     mutate: request,
+    resetDto,
   };
 };
