@@ -114,7 +114,17 @@ export const createQueryHook = <Response, Selected, QueryParams>(
   }, [key, !!queryState, queryParamString, queryParamKeyLength]);
 
   const setParams = useCallback(
-    (queryParams: Partial<QueryParams>) => {
+    (
+      queryParams: Partial<QueryParams>,
+      opts: { forceUpdate?: boolean } = {},
+    ) => {
+      if (
+        opts.forceUpdate &&
+        queryParamString &&
+        queryParamString === prevQueryParamString
+      ) {
+        return request();
+      }
       dispatch([key, ActionDataType.SET_QUERY_PARAMS], {
         queryParams,
       });
