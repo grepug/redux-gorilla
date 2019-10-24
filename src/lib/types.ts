@@ -6,10 +6,9 @@ export class Pagination {
 }
 
 export class QueryTuple<Response> {
-  data: Response | Response[] | null = null;
+  data: Response | null = null;
   loading = false;
   error = false;
-  page = new Pagination();
 }
 
 export interface QueryState<Response, QueryParams> {
@@ -17,7 +16,20 @@ export interface QueryState<Response, QueryParams> {
   params: QueryParams;
 }
 
-export enum QueryStatus {
+export class MutationTuple<Response> {
+  success = false;
+  loading = false;
+  message: string | null = null;
+  errMsg: string | null = null;
+  data: Response | null = null;
+}
+
+export interface MutationState<Response, DataTransferObject> {
+  res: MutationTuple<Response>;
+  dto: DataTransferObject;
+}
+
+export enum RequestStatus {
   SUCESS = 'success',
   ERROR = 'error',
   LOADING = 'loading',
@@ -28,6 +40,8 @@ export type Action = {
   payload?: any;
   page?: Pagination;
   queryParams?: any;
+  mutationParams?: any;
+  dto?: any;
 };
 
 export interface InitialStateType<Response> {
@@ -42,10 +56,15 @@ export enum ActionDataType {
   INIT = 'initialize',
   INIT_RES = 'initializeRes',
   SET_QUERY_PARAMS = 'setQueryParams',
+
+  INIT_MUTATION = 'initMutation',
+  MUTATION = 'mutation',
+  SET_DTO = 'setDTO',
 }
 
-export class InitialState<Response, QueryParams> {
-  query: Partial<Record<string, QueryState<Response, QueryParams>>> = {};
+export class InitialState<Response, Params> {
+  query: Partial<Record<string, QueryState<Response, Params>>> = {};
+  mutations: Partial<Record<string, MutationState<Response, Params>>> = {};
 }
 
 export interface PageParamNames {
@@ -88,7 +107,26 @@ export interface CreateQueryHookOptions<T> {
   isRequestOnMount?: boolean;
 }
 
+export interface CreateMutationHookOptions<DataTransferObject> {
+  dto?: new () => Partial<DataTransferObject>;
+  onMutated?: () => void;
+  // TODO add change key
+  onDtoChange?: (dto: DataTransferObject) => void;
+}
+
 export type HttpRequestMethod<Response> = (
   url: string,
-  method: string,
+  method: Method,
+  config: {
+    body?: any;
+    query?: any;
+  },
 ) => Promise<Response>;
+
+export enum Method {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
+  PATCH = 'PATCH',
+}
