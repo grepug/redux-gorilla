@@ -19,7 +19,7 @@ import get from 'lodash.get';
 export const createQueryHook = <Response, Selected, QueryParams>(
   url: string,
   getData: GetDataType<Response, Selected>,
-  options: CreateQueryHookOptions<QueryParams>,
+  options: CreateQueryHookOptions<Response, QueryParams>,
   httpRequest: HttpRequestMethod<Response>,
 ) => {
   type ReduxInitialState = {
@@ -87,6 +87,21 @@ export const createQueryHook = <Response, Selected, QueryParams>(
   const prevQueryParamKeyLength = usePrevious(queryParamKeyLength);
 
   const prevQueryParamString = usePrevious(queryParamString);
+
+  const { loading, error } = get(
+    queryState,
+    `res[${queryParamString}]`,
+    {},
+  ) as { loading?: boolean; error?: boolean };
+
+  const prevLoading = usePrevious(loading);
+
+  useEffect(() => {
+    if (!loading && prevLoading && !error) {
+      const { data } = get(queryState, `res.${queryParamString}`, {});
+      options.onResponse && options.onResponse(data);
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (queryState && queryState.res[queryParamString]) {

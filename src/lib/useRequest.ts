@@ -35,7 +35,6 @@ export const useRequest = <Response, Params>(
 
   const requestMethod = useCallback(() => {
     if (!canRequest) return;
-
     request<Response>(httpRequest, {
       beforeRequest: () => {
         isLoadingRef.current = true;

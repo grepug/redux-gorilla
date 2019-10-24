@@ -101,12 +101,13 @@ export type GetDataType<T, T1> = (
   page: Pagination | null,
 ) => T1 | null;
 
-export interface CreateQueryHookOptions<T> {
+export interface CreateQueryHookOptions<Response, T> {
   page?: OptionsPage | true;
   queryParams?: T;
   cacheStrategy?: CacheStrategyType;
   poll?: number;
   isRequestOnMount?: boolean;
+  onResponse?: (res: Response) => void;
 }
 
 export interface CreateMutationHookOptions<DataTransferObject> {
