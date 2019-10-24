@@ -166,12 +166,34 @@ export const gorillaReducerFactory = (
         },
       },
     });
+  } else if (dataType === ActionDataType.REST_RES) {
+    return update(state, {
+      query: {
+        [url]: {
+          res: {
+            [paramsString]: {
+              $set: new QueryTuple(),
+            },
+          },
+        },
+      },
+    });
   } else if (dataType === ActionDataType.SET_QUERY_PARAMS) {
     return update(state, {
       query: {
         [url]: {
           params: {
             $merge: action.queryParams || {},
+          },
+          res: {
+            [paramsString]: {
+              $apply: (res: any) => {
+                if (action.isForceUpdate) {
+                  return new QueryTuple();
+                }
+                return res;
+              },
+            },
           },
         },
       },

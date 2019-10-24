@@ -12,6 +12,10 @@ export const queryToString = (obj: any) => {
     : '';
 };
 
+export const isPartialEqual = (obj: any, originalObj: any) => {
+  return Object.keys(obj).every((el: any) => obj[el] === originalObj[el]);
+};
+
 // export const getOfflineCache = () => {
 //   const dataStr = localStorage.getItem('offlineCache');
 //   return dataStr ? repairOfflineCache(JSON.parse(dataStr)) : null;

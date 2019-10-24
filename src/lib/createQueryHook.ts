@@ -13,7 +13,7 @@ import { useEffect, useCallback, useMemo } from 'react';
 import { useRequest } from './useRequest';
 import { useInterval } from './useInterval';
 import { usePrevious } from './usePrevious';
-import { myDispatch, getQueryKey } from './utils';
+import { myDispatch, getQueryKey, isPartialEqual } from './utils';
 import get from 'lodash.get';
 
 export const createQueryHook = <Response, Selected, QueryParams>(
@@ -82,6 +82,8 @@ export const createQueryHook = <Response, Selected, QueryParams>(
 
   const queryParamKeyLength = Object.keys(get(queryState, 'res', {})).length;
 
+  const prevQueryParam = usePrevious(queryParams);
+
   const prevQueryParamKeyLength = usePrevious(queryParamKeyLength);
 
   const prevQueryParamString = usePrevious(queryParamString);
@@ -121,11 +123,12 @@ export const createQueryHook = <Response, Selected, QueryParams>(
       if (
         opts.forceUpdate &&
         queryParamString &&
-        queryParamString === prevQueryParamString
+        isPartialEqual(queryParams, prevQueryParam)
       ) {
         return request();
       }
       dispatch([key, ActionDataType.SET_QUERY_PARAMS], {
+        isForceUpdate: !!opts.forceUpdate,
         queryParams,
       });
     },

@@ -42,6 +42,7 @@ export type Action = {
   queryParams?: any;
   mutationParams?: any;
   dto?: any;
+  isForceUpdate?: boolean;
 };
 
 export interface InitialStateType<Response> {
@@ -56,6 +57,7 @@ export enum ActionDataType {
   INIT = 'initialize',
   INIT_RES = 'initializeRes',
   SET_QUERY_PARAMS = 'setQueryParams',
+  REST_RES = 'resetRes',
 
   INIT_MUTATION = 'initMutation',
   MUTATION = 'mutation',
