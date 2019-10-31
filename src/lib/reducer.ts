@@ -239,6 +239,20 @@ export const gorillaReducerFactory = (
             },
           },
         });
+      case RequestStatus.ERROR:
+        return update(state, {
+          mutations: {
+            [url]: {
+              res: {
+                $merge: {
+                  success: false,
+                  loading: false,
+                  error: true,
+                },
+              },
+            },
+          },
+        });
     }
   } else if (dataType === ActionDataType.SET_DTO) {
     return update(state, {

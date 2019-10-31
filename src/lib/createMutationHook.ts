@@ -10,7 +10,6 @@ import {
 } from './types';
 import { useEffect, useCallback, useMemo } from 'react';
 import { useRequest } from './useRequest';
-import get from 'lodash.get';
 import { usePrevious } from './usePrevious';
 
 export const createMutationHook = <Response, DataTransferObject>(
@@ -56,12 +55,12 @@ export const createMutationHook = <Response, DataTransferObject>(
     [mutationState],
   );
 
-  const loading = mutationState ? mutationState.res.loading : false;
+  const loading= mutationState?.res.loading ?? false
   const prevLoading = usePrevious(loading);
   //
   useEffect(() => {
     if (!loading && prevLoading) {
-      options.onMutated && options.onMutated();
+      options.onMutated?.()
     }
   }, [loading]);
 
@@ -75,12 +74,12 @@ export const createMutationHook = <Response, DataTransferObject>(
   );
 
   const res: MutationTuple<Response> = useMemo(
-    () => get(mutationState, `res`, new MutationTuple()),
+    () => mutationState?.res ?? new MutationTuple(),
     [mutationState],
   );
 
   const dto = useMemo(
-    () => (mutationState ? mutationState.dto : ({} as DataTransferObject)),
+    () => mutationState?.dto ?? ({} as DataTransferObject),
     [mutationState],
   );
 

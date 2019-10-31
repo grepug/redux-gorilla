@@ -19,6 +19,7 @@ export interface QueryState<Response, QueryParams> {
 export class MutationTuple<Response> {
   success = false;
   loading = false;
+  error = false;
   message: string | null = null;
   errMsg: string | null = null;
   data: Response | null = null;
