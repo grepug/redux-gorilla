@@ -204,7 +204,7 @@ export const gorillaReducerFactory = (
         $merge: {
           [url]: {
             res: new MutationTuple(),
-            dto: {},
+            dto: action.mutationParams,
           },
         },
       },

@@ -31,10 +31,14 @@ export const createMutationHook = <Response, DataTransferObject>(
     ReturnType<typeof getState>
   >(getState, shallowEqual);
 
+  const initialDto = options.dto;
+
   //
   useEffect(() => {
     if (mutationState == null) {
-      dispatch([url, ActionDataType.INIT_MUTATION]);
+      dispatch([url, ActionDataType.INIT_MUTATION], {
+        mutationParams: initialDto ? new initialDto() : {}
+      });
     }
   }, [!mutationState]);
 
@@ -57,7 +61,7 @@ export const createMutationHook = <Response, DataTransferObject>(
 
   const loading= mutationState?.res.loading ?? false
   const prevLoading = usePrevious(loading);
-  //
+  // status of mutation
   useEffect(() => {
     if (!loading && prevLoading) {
       options.onMutated?.()
@@ -84,20 +88,26 @@ export const createMutationHook = <Response, DataTransferObject>(
   );
 
   useEffect(() => {
-    options.onDtoChange && options.onDtoChange(dto);
+    options.onDtoChange?.(dto);
   }, [dto]);
-
-  const initialDto = options.dto;
 
   const resetDto = useCallback(() => {
     setDto(initialDto ? new initialDto() : {});
   }, [initialDto]);
 
+  const mutate = useCallback(() => {
+    const body = options.transformDto?.(dto);
+    const isValid = options.shouldMutate?.(dto) ?? true;
+    if (isValid) {
+      request({ body });
+    }
+  }, [dto, request])
+
   return {
     res,
     dto,
     setDto,
-    mutate: request,
+    mutate,
     resetDto,
   };
 };

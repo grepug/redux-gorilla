@@ -116,6 +116,10 @@ export interface CreateMutationHookOptions<DataTransferObject> {
   onMutated?: () => void;
   // TODO add change key
   onDtoChange?: (dto: DataTransferObject) => void;
+  transformDto?: (
+    dto: DataTransferObject,
+  ) => Record<keyof DataTransferObject, any>;
+  shouldMutate?: (dto: DataTransferObject) => boolean;
 }
 
 export type HttpRequestMethod<Response> = (

@@ -33,30 +33,38 @@ export const useRequest = <Response, Params>(
   const dispatch = myDispatch(useDispatch());
   const isLoadingRef = useRef(false);
 
-  const requestMethod = useCallback(() => {
-    if (!canRequest) return;
-    request<Response>(httpRequest, {
-      beforeRequest: () => {
-        isLoadingRef.current = true;
-        dispatch([key, actionDataType, RequestStatus.LOADING]);
-      },
-      onResponse: res => {
-        isLoadingRef.current = false;
+  const requestMethod = useCallback(
+    (
+      opts: {
+        body?: any;
+        query?: any;
+      } = {},
+    ) => {
+      if (!canRequest) return;
+      request<Response>(httpRequest, {
+        beforeRequest: () => {
+          isLoadingRef.current = true;
+          dispatch([key, actionDataType, RequestStatus.LOADING]);
+        },
+        onResponse: res => {
+          isLoadingRef.current = false;
 
-        return dispatch([key, actionDataType, RequestStatus.SUCESS], {
-          payload: res,
-        });
-      },
-      onError: () => {
-        isLoadingRef.current = false;
-        return dispatch([key, actionDataType, RequestStatus.ERROR]);
-      },
-      url,
-      body,
-      query,
-      method,
-    });
-  }, [url, key, ...deps]);
+          return dispatch([key, actionDataType, RequestStatus.SUCESS], {
+            payload: res,
+          });
+        },
+        onError: () => {
+          isLoadingRef.current = false;
+          return dispatch([key, actionDataType, RequestStatus.ERROR]);
+        },
+        url,
+        body: opts.body || body,
+        query: opts.query || query,
+        method,
+      });
+    },
+    [url, key, ...deps],
+  );
 
   return {
     request: requestMethod,
