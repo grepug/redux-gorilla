@@ -19,6 +19,7 @@ export interface QueryState<Response, QueryParams> {
 export class MutationTuple<Response> {
   success = false;
   loading = false;
+  error = false;
   message: string | null = null;
   errMsg: string | null = null;
   data: Response | null = null;
@@ -42,6 +43,7 @@ export type Action = {
   queryParams?: any;
   mutationParams?: any;
   dto?: any;
+  isForceUpdate?: boolean;
 };
 
 export interface InitialStateType<Response> {
@@ -56,6 +58,7 @@ export enum ActionDataType {
   INIT = 'initialize',
   INIT_RES = 'initializeRes',
   SET_QUERY_PARAMS = 'setQueryParams',
+  REST_RES = 'resetRes',
 
   INIT_MUTATION = 'initMutation',
   MUTATION = 'mutation',
@@ -99,12 +102,13 @@ export type GetDataType<T, T1> = (
   page: Pagination | null,
 ) => T1 | null;
 
-export interface CreateQueryHookOptions<T> {
+export interface CreateQueryHookOptions<Response, T> {
   page?: OptionsPage | true;
   queryParams?: T;
   cacheStrategy?: CacheStrategyType;
   poll?: number;
   isRequestOnMount?: boolean;
+  onResponse?: (res: Response) => void;
 }
 
 export interface CreateMutationHookOptions<DataTransferObject> {
@@ -112,6 +116,10 @@ export interface CreateMutationHookOptions<DataTransferObject> {
   onMutated?: () => void;
   // TODO add change key
   onDtoChange?: (dto: DataTransferObject) => void;
+  transformDto?: (
+    dto: DataTransferObject,
+  ) => Record<keyof DataTransferObject, any>;
+  shouldMutate?: (dto: DataTransferObject) => boolean;
 }
 
 export type HttpRequestMethod<Response> = (

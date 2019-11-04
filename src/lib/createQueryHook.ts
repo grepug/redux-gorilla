@@ -13,13 +13,12 @@ import { useEffect, useCallback, useMemo } from 'react';
 import { useRequest } from './useRequest';
 import { useInterval } from './useInterval';
 import { usePrevious } from './usePrevious';
-import { myDispatch, getQueryKey } from './utils';
-import get from 'lodash.get';
+import { myDispatch, getQueryKey, isPartialEqual } from './utils';
 
 export const createQueryHook = <Response, Selected, QueryParams>(
   url: string,
   getData: GetDataType<Response, Selected>,
-  options: CreateQueryHookOptions<QueryParams>,
+  options: CreateQueryHookOptions<Response, QueryParams>,
   httpRequest: HttpRequestMethod<Response>,
 ) => {
   type ReduxInitialState = {
@@ -80,11 +79,24 @@ export const createQueryHook = <Response, Selected, QueryParams>(
   //     localStorage.setItem('offlineCache', JSON.stringify(state)),
   // });
 
-  const queryParamKeyLength = Object.keys(get(queryState, 'res', {})).length;
+  const queryParamKeyLength = Object.keys(queryState?.res ?? {}).length;
+
+  const prevQueryParam = usePrevious(queryParams);
 
   const prevQueryParamKeyLength = usePrevious(queryParamKeyLength);
 
   const prevQueryParamString = usePrevious(queryParamString);
+
+  const {loading, error} = queryState?.res[queryParamString] ?? {} as { loading?: boolean; error?: boolean };
+
+  const prevLoading = usePrevious(loading);
+
+  useEffect(() => {
+    if (!loading && prevLoading && !error) {
+      const { data } = queryState?.res[queryParamString] ?? {}
+      options.onResponse?.(data as Response)
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (queryState && queryState.res[queryParamString]) {
@@ -121,11 +133,12 @@ export const createQueryHook = <Response, Selected, QueryParams>(
       if (
         opts.forceUpdate &&
         queryParamString &&
-        queryParamString === prevQueryParamString
+        isPartialEqual(queryParams, prevQueryParam)
       ) {
         return request();
       }
       dispatch([key, ActionDataType.SET_QUERY_PARAMS], {
+        isForceUpdate: !!opts.forceUpdate,
         queryParams,
       });
     },
@@ -133,17 +146,18 @@ export const createQueryHook = <Response, Selected, QueryParams>(
   );
 
   const res: QueryTuple<Response> = useMemo(
-    () => get(queryState, `res.${queryParamString}`, new QueryTuple()),
+    () => queryState?.res[queryParamString] ?? new QueryTuple(),
     [queryState, queryParamString],
   );
 
   const params = useMemo(
-    () => (queryState ? queryState.params : ({} as QueryParams)),
+    () => queryState?.params ?? ({} as QueryParams),
     [queryState],
   );
 
   const data = useMemo(() => {
-    const { data, page } = get(queryState, `res.${queryParamString}`, {});
+    const {data, page} = queryState?.res[queryParamString] ?? ({} as any)
+
     return getData(
       (data || null) as (Response | null),
       (page || null) as (Pagination | null),
