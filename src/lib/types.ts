@@ -121,6 +121,10 @@ export interface CreateMutationHookOptions<DataTransferObject> {
     dto: DataTransferObject,
   ) => Record<keyof DataTransferObject, any>;
   shouldMutate?: (dto: DataTransferObject) => boolean;
+  responseSuccessProperty: {
+    path: string;
+    isSuccess: (v: any) => boolean;
+  };
 }
 
 export type HttpRequestMethod<Response> = (

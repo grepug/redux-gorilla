@@ -1,21 +1,35 @@
 import { createMutationHook } from '../../src/lib/createMutationHook';
-import axios from 'axios';
 import { CreateMutationHookOptions } from '../../src/lib/types';
+
+type Options<Params> = Omit<
+  CreateMutationHookOptions<Params>,
+  'responseSuccessProperty'
+>;
 
 export const useMutation = <Response, Params>(
   url: string,
   dto: new () => Partial<Params>,
-  options: CreateMutationHookOptions<Params>,
+  options: Options<Params>,
+  fakeSucess: boolean,
 ) => {
   return createMutationHook<Response, Params>(
     url,
-    async (url, _, { body }) => {
-      console.count('mutate');
-      console.log('body', JSON.stringify(body));
+    async () => {
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-      const res: any = await axios.post(url, body).then(res => res.data);
+      const res: any = {
+        success: fakeSucess,
+      };
+
       return res as Response;
     },
-    { ...options, dto },
+    {
+      responseSuccessProperty: {
+        path: 'success',
+        isSuccess: v => v,
+      },
+      ...options,
+      dto,
+    },
   );
 };

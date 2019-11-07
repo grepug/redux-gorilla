@@ -8,6 +8,7 @@ import { request } from './request';
 import { useDispatch } from 'react-redux';
 import { useCallback, useRef } from 'react';
 import { myDispatch } from './utils';
+import get from 'lodash.get';
 
 export const useRequest = <Response, Params>(
   httpRequest: HttpRequestMethod<Response>,
@@ -19,12 +20,17 @@ export const useRequest = <Response, Params>(
     query,
     body,
     method,
+    responseSuccessProperty,
   }: {
     actionDataType: ActionDataType;
     key: string;
     url: string;
     canRequest: boolean;
     method: Method;
+    responseSuccessProperty: {
+      path: string;
+      isSuccess: (v: any) => boolean;
+    };
     query?: Params;
     body?: Params;
   },
@@ -48,6 +54,15 @@ export const useRequest = <Response, Params>(
         },
         onResponse: res => {
           isLoadingRef.current = false;
+
+          if (actionDataType === ActionDataType.MUTATION) {
+            const isSuccessVal = get(res, responseSuccessProperty.path);
+            const isSuccess = responseSuccessProperty.isSuccess(isSuccessVal);
+
+            if (!isSuccess) {
+              return dispatch([key, actionDataType, RequestStatus.ERROR]);
+            }
+          }
 
           return dispatch([key, actionDataType, RequestStatus.SUCESS], {
             payload: res,
