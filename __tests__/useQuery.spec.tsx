@@ -9,10 +9,10 @@ interface ListResponse {
   id?: number;
   name?: string;
   _page?: number;
-  _limit?: number;
+  _pageSize?: number;
 }
 
-test('abc', async () => {
+test('test useQuery', async () => {
   const store = createStore(createRootReducer());
 
   const wrapper = ({ children }: { children?: React.ReactNode }) => (
@@ -25,7 +25,7 @@ test('abc', async () => {
         'list',
         {
           _page: 1,
-          _limit: 2,
+          _pageSize: 2,
         },
         {},
       ),
@@ -53,15 +53,47 @@ test('abc', async () => {
 
   expect(result.current.res.data).toEqual([{ id: 1, name: 'iPhone' }]);
 
+  act(() => result.current.setParams({ _page: 2 }, { rmParams: ['name'] }));
+
+  expect(result.current.params).toEqual({ _page: 2, _pageSize: 2 });
+
+  await waitForNextUpdate();
+
+  expect(result.current.res.data).toEqual([
+    {
+      id: 3,
+      name: 'AirPods',
+    },
+    {
+      id: 4,
+      name: 'MacBook',
+    },
+  ]);
+
   act(() => result.current.request());
 
   await waitForNextUpdate();
 
-  expect(result.current.res.data).toEqual([{ id: 1, name: 'iPhone' }]);
+  expect(result.current.res.data).toEqual([
+    {
+      id: 3,
+      name: 'AirPods',
+    },
+    {
+      id: 4,
+      name: 'MacBook',
+    },
+  ]);
 
   expect(result.current.params).toEqual({
-    name: 'iPhone',
-    _limit: 2,
-    _page: 1,
+    _pageSize: 2,
+    _page: 2,
   });
+
+  // retrieve from 'cache', so doesn't need await;
+  act(() =>
+    result.current.setParams({ name: 'iPhone', _page: 1, _pageSize: 2 }),
+  );
+
+  expect(result.current.res.data).toEqual([{ id: 1, name: 'iPhone' }]);
 });

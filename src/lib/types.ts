@@ -44,6 +44,7 @@ export type Action = {
   mutationParams?: any;
   dto?: any;
   isForceUpdate?: boolean;
+  rmQueryParams?: string[];
 };
 
 export interface InitialStateType<Response> {

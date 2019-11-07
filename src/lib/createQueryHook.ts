@@ -128,7 +128,7 @@ export const createQueryHook = <Response, Selected, QueryParams>(
   const setParams = useCallback(
     (
       queryParams: Partial<QueryParams>,
-      opts: { forceUpdate?: boolean } = {},
+      opts: { forceUpdate?: boolean, rmParams?: (keyof QueryParams)[] } = {},
     ) => {
       if (
         opts.forceUpdate &&
@@ -140,6 +140,7 @@ export const createQueryHook = <Response, Selected, QueryParams>(
       dispatch([key, ActionDataType.SET_QUERY_PARAMS], {
         isForceUpdate: !!opts.forceUpdate,
         queryParams,
+        rmQueryParams: opts.rmParams
       });
     },
     [dispatch],

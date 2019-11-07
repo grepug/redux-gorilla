@@ -8,6 +8,7 @@ import {
 } from './types';
 import update from 'immutability-helper';
 import { ACTION_TYPE_SEPARATOR } from './constants';
+import { omitBy } from './utils';
 
 export const gorillaReducerFactory = (
   options: {
@@ -184,6 +185,15 @@ export const gorillaReducerFactory = (
         [url]: {
           params: {
             $merge: action.queryParams || {},
+            $apply: (res: any) => {
+              const obj = { ...res, ...action.queryParams };
+              if (action.rmQueryParams) {
+                return omitBy(obj, (_, k) =>
+                  action.rmQueryParams!.includes(k as string),
+                );
+              }
+              return obj;
+            },
           },
           res: {
             [paramsString]: {
