@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "iPhone"
+    },
+    {
+      "id": 2,
+      "name": "iPad"
+    },
+    {
+      "id": 3,
+      "name": "AirPods"
+    }
+  ],
+  "info": {
+    "title": "Hello"
+  }
+}
