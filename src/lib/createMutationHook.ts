@@ -49,6 +49,7 @@ export const createMutationHook = <Response, DataTransferObject>(
       key: url,
       url,
       canRequest: !!mutationState,
+      responseSuccessProperty: options.responseSuccessProperty,
       method: Method.POST,
       body: mutationState
         ? mutationState.dto

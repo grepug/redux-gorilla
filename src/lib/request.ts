@@ -1,4 +1,4 @@
-import { queryToString } from './utils';
+// import { queryToString } from './utils';
 import { HttpRequestMethod, Method } from './types';
 
 export const request = async <Response>(
@@ -15,9 +15,9 @@ export const request = async <Response>(
 ) => {
   try {
     args.beforeRequest();
-    const queryString = queryToString(args.query);
-    const url = args.url + (/\?/.test(args.url) ? '' : '?') + queryString;
-    const res: Response = await httpRequest(url, args.method, {
+    // const queryString = queryToString(args.query);
+    // const url = args.url + (/\?/.test(args.url) ? '' : '?') + queryString;
+    const res: Response = await httpRequest(args.url, args.method, {
       query: args.query,
       body: args.body,
     });
